@@ -7,6 +7,8 @@ pipeline {
 
     environment {
         MAVEN_OPTS = '-Xmx1024m'
+        DOCKER_IMAGE = 'aymane2025/aymanerepo' 
+        DOCKER_TAG = 'latest'
     }
 
     stages {
@@ -36,6 +38,17 @@ pipeline {
         stage('Package') {
             steps {
                 sh 'mvn package'
+            }
+        }
+
+        stage('Docker Build and Push') {
+            steps {
+                script {
+                    docker.withRegistry('', 'docker-hub-credentials') {
+                        def customImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
+                        customImage.push()
+                    }
+                }
             }
         }
     }
