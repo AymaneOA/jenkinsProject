@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         MAVEN_OPTS = '-Xmx1024m'
-        DOCKER_IMAGE = 'aymane2025/aymanerepo' 
+        DOCKER_IMAGE = 'aymane5/aymanove' 
         DOCKER_TAG = 'latest'
     }
 
