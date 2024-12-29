@@ -44,7 +44,7 @@ pipeline {
         stage('Docker Build and Push') {
             steps {
                 script {
-                    docker.withRegistry('', 'docker-hub-credentials') {
+                    docker.withRegistry('', 'docker2021') {
                         def customImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
                         customImage.push()
                     }
