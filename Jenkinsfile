@@ -9,6 +9,8 @@ pipeline {
         MAVEN_OPTS = '-Xmx1024m'
         DOCKER_IMAGE = 'aymane5/aymanove' 
         DOCKER_TAG = 'latest'
+        REMOTE_SERVER='aymane2@192.168.153.130'
+        REMOTE_SERVER_SSH='ssh2021'
     }
 
     stages {
@@ -48,9 +50,28 @@ pipeline {
                         def customImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
                         customImage.push()
                     }
+                    
+                }
+                
+            }
+            
+        }
+         stage('Deploy to Remote Server') {
+            steps {
+                echo 'Deploying to a Remote Server...'
+                sshagent([REMOTE_SERVER_SSH]) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no $REMOTE_SERVER "
+                        docker stop \$(docker ps -q --filter ancestor=${DOCKER_REPO}:${DOCKER_TAG}) || true &&
+                        docker rm \$(docker ps -q --filter ancestor=${DOCKER_REPO}:${DOCKER_TAG}) || true &&
+                        docker pull ${DOCKER_REPO}:${DOCKER_TAG} &&
+                        docker run -d -p 8080:8080 ${DOCKER_REPO}:${DOCKER_TAG}
+                    "
+                    """
                 }
             }
         }
+
     }
 
     post {
